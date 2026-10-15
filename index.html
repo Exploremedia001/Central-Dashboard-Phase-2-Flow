@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ExploreMedia Central Dashboard – Phase 2 Flow (RBAC + GBP Calls)</title>
+<title>ExploreMedia Central Dashboard - Phase 2 Flow (RBAC + GBP + Embed Links)</title>
 <style>
   :root {
     --navy: #0f4c81;
@@ -254,6 +254,13 @@
   .action { font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--line); }
   .action.no { color: #cbd5e1; text-decoration: line-through; }
   .client-sw { font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--line); background: #fff; }
+  .mock-acct { font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 8px; border: 1px solid #bfdbfe; background: var(--soft); color: var(--navy); }
+  .mock-acct-menu {
+    margin-top: auto; padding: 6px; border: 1px solid var(--line); border-radius: 10px; background: #fff;
+    box-shadow: 0 8px 20px -12px rgba(15,76,129,.35); font-size: 11px; font-weight: 600; display: grid; gap: 2px;
+  }
+  .mock-acct-menu span { padding: 6px 8px; border-radius: 6px; color: var(--ink); }
+  .mock-acct-menu span:last-child { color: var(--bad); }
 
   /* ---------- Security ---------- */
   .sec { padding: 22px; display: flex; gap: 14px; }
@@ -347,6 +354,126 @@
   .need h4 { margin: 2px 0 4px; font-size: 15px; }
   .need p { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
 
+  /* ---------- Embed / share ---------- */
+  .pill.embed { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+  .clients-mock { padding: 0; overflow: hidden; margin-top: 22px; }
+  .clients-mock .cm-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 16px 20px; background: linear-gradient(135deg, #0f4c81, #142f45); color: #fff;
+  }
+  .clients-mock .cm-head h3 { margin: 0; font-size: 16px; }
+  .clients-mock .cm-head span { font-size: 12px; color: #93c5fd; }
+  .cm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cm-table th {
+    text-align: left; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); padding: 12px 14px; border-bottom: 1px solid var(--line); background: #f8fafc;
+  }
+  .cm-table td { padding: 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  .cm-table tr:last-child td { border-bottom: none; }
+  .cm-name { font-weight: 700; }
+  .cm-name small { display: block; font-size: 11px; font-weight: 600; color: var(--ok); margin-top: 2px; }
+  .cm-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .cm-btn {
+    display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px;
+    border-radius: 9px; border: 1px solid var(--line); background: #fff; font-size: 12px; font-weight: 700; color: var(--ink);
+  }
+  .cm-btn.embed { border-color: #bfdbfe; background: var(--soft); color: var(--navy); }
+  .cm-btn.sync { border-color: #bfdbfe; color: var(--lsa); }
+  .cm-btn.rean { border-color: #fed7aa; color: #c2410c; }
+  .cm-btn.icon { width: 32px; padding: 0; justify-content: center; color: var(--muted); }
+  .cm-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--ok);
+    box-shadow: 0 0 0 3px rgba(5,150,105,.18);
+  }
+  .embed-modal {
+    max-width: 520px; margin: 22px auto 0; padding: 0; overflow: hidden;
+  }
+  .embed-modal .em-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 16px 20px; border-bottom: 1px solid var(--line); background: #f8fafc;
+  }
+  .embed-modal .em-head b { font-size: 15px; }
+  .embed-modal .em-body { padding: 18px 20px 20px; display: grid; gap: 16px; }
+  .em-label { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .em-dash { display: grid; gap: 8px; }
+  .em-opt {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--line); font-size: 13px; font-weight: 600; background: #fff;
+  }
+  .em-opt.on { border-color: #93c5fd; background: var(--soft); color: var(--navy); }
+  .em-radio {
+    width: 16px; height: 16px; border-radius: 50%; border: 2px solid #94a3b8; flex: none;
+    display: grid; place-items: center;
+  }
+  .em-opt.on .em-radio { border-color: var(--navy); }
+  .em-opt.on .em-radio::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--navy); }
+  .em-expiry { display: flex; gap: 8px; flex-wrap: wrap; }
+  .em-chip {
+    padding: 7px 12px; border-radius: 99px; border: 1px solid var(--line); background: #fff;
+    font-size: 12px; font-weight: 700; color: var(--muted);
+  }
+  .em-chip.on { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .em-foot { display: flex; justify-content: flex-end; gap: 8px; padding-top: 4px; }
+  .em-btn {
+    height: 36px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line);
+    background: #fff; font-size: 13px; font-weight: 700; color: var(--ink);
+  }
+  .em-btn.primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .em-btn.danger { background: #fff1f2; color: var(--bad); border-color: #fecdd3; }
+  .em-url-row {
+    display: flex; gap: 8px; align-items: center; padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--line); background: #f8fafc;
+  }
+  .em-url-row code {
+    flex: 1; font-size: 12px; font-weight: 600; color: var(--navy); overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap; font-family: ui-monospace, Consolas, monospace;
+  }
+  .em-status {
+    display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--muted);
+  }
+  .em-status .ok { color: var(--ok); }
+  .em-status .warn { color: var(--warn); }
+  .em-actions-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .share-view {
+    margin-top: 18px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: #fff;
+    box-shadow: 0 6px 24px -14px rgba(15,76,129,.35);
+  }
+  .share-view .sv-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    padding: 14px 18px; background: linear-gradient(135deg, #0f4c81, #142f45); color: #fff;
+  }
+  .share-view .sv-bar b { font-size: 15px; }
+  .share-view .sv-bar span { font-size: 11px; color: #93c5fd; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .sv-date {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 9px;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25); font-size: 12px; font-weight: 700;
+  }
+  .sv-date::after { content: "▾"; opacity: .7; font-size: 10px; }
+  .sv-body { padding: 16px 18px 18px; }
+  .sv-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .sv-kpi { padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: #f8fafc; }
+  .sv-kpi small { display: block; font-size: 10px; font-weight: 800; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+  .sv-kpi b { font-size: 22px; font-variant-numeric: tabular-nums; }
+  .sv-kpi .split { display: flex; gap: 10px; margin-top: 6px; font-size: 11px; font-weight: 700; color: var(--muted); }
+  .sv-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .sv-chart { padding: 14px; border-radius: 12px; border: 1px solid var(--line); }
+  .sv-chart h5 { margin: 0 0 10px; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .sv-donut-wrap { display: flex; gap: 12px; align-items: center; }
+  .sv-donut { width: 100px; height: 100px; flex: none; }
+  .sv-donut circle { fill: none; stroke-width: 14; transform: rotate(-90deg); transform-origin: 50% 50%; }
+  .slide.active .sv-donut circle[data-v] { animation: draw 1.4s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--d, .9s); }
+  html.static .sv-donut circle[data-v] { animation: none !important; }
+  .sv-donut-legend { display: grid; gap: 6px; font-size: 11px; font-weight: 600; }
+  .sv-donut-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 3px; margin-right: 6px; }
+  .sv-note {
+    margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: #eff6ff; border: 1px solid #bfdbfe;
+    font-size: 12.5px; font-weight: 600; color: var(--navy);
+  }
+  .alias-note {
+    display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding: 12px 14px;
+    border-radius: 12px; background: #fffbeb; border: 1px solid #fde68a; font-size: 13px; font-weight: 600; color: #92400e;
+  }
+
   .side-nav {
     zoom: var(--z);
     position: fixed; top: 50%; transform: translateY(-50%); z-index: 25;
@@ -374,7 +501,7 @@
   @media (max-width: 860px) {
     h1 { font-size: 34px; } .hero h1 { font-size: 38px; } h2 { font-size: 26px; }
     .hero { padding: 34px; }
-    .grid2, .grid3, .invite, .together, .extra-row, .kpi-grid, .classify { grid-template-columns: 1fr; }
+    .grid2, .grid3, .invite, .together, .extra-row, .kpi-grid, .classify, .sv-kpis, .sv-charts { grid-template-columns: 1fr; }
     .flow, .gbp-flow { grid-template-columns: 1fr 1fr; row-gap: 26px; }
     .flow-track, .runner { display: none; }
     .gantt { --label: 190px; }
@@ -413,9 +540,9 @@
 
 <header class="topbar">
   <div class="brand">
-    <div>Central Dashboard – Phase 2<small>EXPLORE MEDIA × E2M</small></div>
+    <div>Central Dashboard - Phase 2<small>EXPLORE MEDIA × E2M</small></div>
   </div>
-  <div class="meta">Oct 14 – Nov 14, 2026 · Role-Based Access + GBP Calls</div>
+  <div class="meta">Oct 14 - Nov 14, 2026 · RBAC · GBP · Embed Links</div>
 </header>
 <div class="progress" id="progress"></div>
 
@@ -426,10 +553,10 @@
     <div class="wrap">
       <div class="hero a">
         <div class="eyebrow">Phase 2 · Implementation flow</div>
-        <h1>Role-Based Access &amp; GBP Calls<br />in the Central Dashboard</h1>
-        <p>How the two new features will work, and what each user will see.</p>
+        <h1>RBAC, GBP Calls &amp; Embed Links<br />in the Central Dashboard</h1>
+        <p>How the three new features will work, and what each user will see.</p>
         <div class="hero-row">
-          <div class="hero-chip a" style="--d:.3s"><b>2 features</b><span>RBAC · GBP calls</span></div>
+          <div class="hero-chip a" style="--d:.3s"><b>3 features</b><span>RBAC · GBP · Embed</span></div>
           <div class="hero-chip a" style="--d:.45s"><b>1 month</b><span>14 Oct → 14 Nov</span></div>
           <div class="hero-chip a" style="--d:.6s"><b>3 default roles</b><span>Admin · Team Member · Client</span></div>
           <div class="hero-chip a" style="--d:.75s"><b>3 call sources</b><span>LSA · SEM · GBP</span></div>
@@ -442,9 +569,9 @@
   <section class="slide" data-title="Overview">
     <div class="wrap">
       <div class="eyebrow a">What we are building</div>
-      <h2 class="a" style="--d:.1s">Two features, one dashboard</h2>
-      <p class="lead a" style="--d:.2s">Both features live in the same Central Dashboard and work together: whatever a user is allowed to see also applies to GBP calls.</p>
-      <div class="grid2" style="margin-top:26px">
+      <h2 class="a" style="--d:.1s">Three features, one dashboard</h2>
+      <p class="lead a" style="--d:.2s">All three live in the same Central Dashboard: login access for deep work, GBP as a third call source, and a view-only embed URL for white-label reports.</p>
+      <div class="grid3" style="margin-top:26px">
         <div class="card feature a pop" style="--d:.35s">
           <div class="ic" style="background:#eff6ff">🔐</div>
           <span class="pill soft">Requirement 1</span>
@@ -454,7 +581,7 @@
             <li>Admin invites users and picks their role and clients</li>
             <li>Roles &amp; Permissions screen to create custom roles</li>
             <li>Sidebar, pages and buttons follow the user's permissions</li>
-            <li>Client users only ever see their own client's data</li>
+            <li>Client users see only permitted dashboards and their own client's data</li>
           </ul>
         </div>
         <div class="card feature a pop" style="--d:.5s">
@@ -464,9 +591,21 @@
           <p>Calls from each client's Google Business Profile listing are tracked next to the existing LSA and SEM calls.</p>
           <ul>
             <li>GBP calls pulled from GoHighLevel (eMConnect)</li>
-            <li>Same AI analysis: booking status, summary, transcript</li>
+            <li>eMConnect “Local SEO” treated as GBP</li>
             <li>GBP source filter and KPI cards on the dashboard</li>
             <li>GBP included in the Excel export</li>
+          </ul>
+        </div>
+        <div class="card feature a pop" style="--d:.65s">
+          <div class="ic" style="background:#f0fdf4">🔗</div>
+          <span class="pill embed">Requirement 3</span>
+          <h3 style="margin-top:10px">Embeddable view-only URL</h3>
+          <p>A client-scoped link Admin can paste into Explore Media’s white-label reporting platform (or Slides). No extra login.</p>
+          <ul>
+            <li>Generate from Clients → Embed link</li>
+            <li>Shows KPIs, charts and client name</li>
+            <li>Date range is the only interactive control</li>
+            <li>Optional expiry; revoke anytime</li>
           </ul>
         </div>
       </div>
@@ -544,7 +683,7 @@
     <div class="wrap">
       <div class="eyebrow a">Team Access → Roles &amp; Permissions</div>
       <h2 class="a" style="--d:.1s">Roles decide what people can do</h2>
-      <p class="lead a" style="--d:.2s">Three roles come ready to use. Admin can create more, for example "Client – View Only", and choose permissions section by section.</p>
+      <p class="lead a" style="--d:.2s">Three roles come ready to use. Admin can create more, for example "Client - View Only", and choose permissions section by section.</p>
       <div class="grid3" style="margin-top:24px">
         <div class="card role-card a" style="--d:.3s">
           <div class="role-head"><h3>Admin</h3><span class="pill navy">Default · Locked</span></div>
@@ -554,15 +693,15 @@
         </div>
         <div class="card role-card a" style="--d:.45s">
           <div class="role-head"><h3>Team Member</h3><span class="pill grey">Editable</span></div>
-          <p>exploreMedia team. Call Analyzer for their assigned clients, reanalyze and export.</p>
+          <p>exploreMedia team. Admin can grant more permissions per role. Default includes Call Analyzer for assigned clients.</p>
           <div class="bar-meta"><span>12 of 23 permissions</span><span>52%</span></div>
           <div class="bar"><i data-w="52"></i></div>
         </div>
         <div class="card role-card a" style="--d:.6s">
           <div class="role-head"><h3>Client</h3><span class="pill grey">Editable</span></div>
-          <p>End-client users. Their own client's calls, transcripts, recordings and booking status.</p>
-          <div class="bar-meta"><span>3 of 23 permissions</span><span>13%</span></div>
-          <div class="bar"><i data-w="13"></i></div>
+          <p>End-client users. Dashboard modules only (e.g. Call Analyzer). No Clients, Team Access, Connectors, or Settings.</p>
+          <div class="bar-meta"><span>1 of 23 permissions</span><span>4%</span></div>
+          <div class="bar"><i data-w="4"></i></div>
         </div>
       </div>
       <div class="card a" style="--d:.8s; margin-top:20px; padding:20px">
@@ -584,6 +723,7 @@
           <span class="pill grey">Role names must be unique</span>
           <span class="pill grey">Admin role can't be edited or deleted</span>
           <span class="pill grey">A role in use can't be deleted until its users are moved</span>
+          <span class="pill grey">Default Client: dashboard permissions only; account menu is reset password and sign out</span>
         </div>
       </div>
     </div>
@@ -599,7 +739,7 @@
         <div class="card form a" style="--d:.3s">
           <div class="field"><label>Display name *</label><div class="input"><span class="typed" style="--w:11ch;--d:.6s">Jane Cooper</span></div></div>
           <div class="field"><label>Email *</label><div class="input"><span class="typed" style="--w:22ch;--d:1.6s">jane@aacooling.com</span></div></div>
-          <div class="field"><label>Role *</label><div class="input a fade" style="--d:2.7s">Client <span style="margin-left:auto;font-size:11px;color:var(--muted)">3 permissions</span></div></div>
+          <div class="field"><label>Role *</label><div class="input a fade" style="--d:2.7s">Client <span style="margin-left:auto;font-size:11px;color:var(--muted)">1 permission</span></div></div>
           <div class="field"><label>Client access *</label>
             <div class="chips">
               <span class="chip sel a pop" style="--d:3.1s">✓ AA Cooling</span>
@@ -686,18 +826,19 @@
           </div>
         </div>
         <div class="card mock a pop" style="--d:.75s">
-          <div class="mock-top"><b>Client · AA Cooling</b><span class="client-sw">AA Cooling</span></div>
+          <div class="mock-top"><b>Client · AA Cooling</b><span class="mock-acct">Account ▾</span></div>
           <div class="mock-body">
-            <div class="side"><span class="on">Call Analyzer</span><span class="off">Clients</span><span class="off">Connectors</span><span class="off">Team Access</span><span class="off">Activity Logs</span><span class="off">Settings</span></div>
+            <div class="side"><span class="on">Call Analyzer</span></div>
             <div class="main">
               <div class="kpis"><div class="kpi"><small>LSA</small><b>36</b></div><div class="kpi"><small>SEM</small><b>22</b></div><div class="kpi"><small>GBP</small><b>9</b></div></div>
               <div class="action-row"><span class="action no">Reanalyze</span><span class="action no">Export</span><span class="action">Edit booking</span></div>
               <div class="rowline"></div><div class="rowline" style="width:55%"></div>
+              <div class="mock-acct-menu a" style="--d:.9s"><span>Reset password</span><span>Sign out</span></div>
             </div>
           </div>
         </div>
       </div>
-      <p class="a" style="--d:1s;font-size:12px;color:var(--muted);margin-top:14px">Example only. Numbers are illustrative; Team Member and Client permissions are set by Admin.</p>
+      <p class="a" style="--d:1s;font-size:12px;color:var(--muted);margin-top:14px">Example only. Client sidebar shows permitted dashboards only; account menu is reset password and sign out. Admin sets Team Member permissions.</p>
     </div>
   </section>
 
@@ -726,8 +867,8 @@
       <div class="flow gbp-flow">
         <div class="flow-track"><i></i></div>
         <div class="runner"></div>
-        <div class="step a" style="--d:.4s"><span class="num">1</span><div class="node">☎️</div><div class="who">GHL / eMConnect</div><h4>GBP call data</h4><p>Calls on the client's GBP tracking numbers are fetched from GoHighLevel (eMConnect).</p></div>
-        <div class="step a" style="--d:.8s"><span class="num">2</span><div class="node">🔄</div><div class="who">Dashboard sync</div><h4>Synced &amp; tagged GBP</h4><p>Regular sync imports each call and tags it as source <b>GBP</b>.</p></div>
+        <div class="step a" style="--d:.4s"><span class="num">1</span><div class="node">☎️</div><div class="who">GHL / eMConnect</div><h4>GBP / Local SEO</h4><p>Calls on pools named <b>GBP</b> or <b>Local SEO</b> are fetched from eMConnect. They are the same source.</p></div>
+        <div class="step a" style="--d:.8s"><span class="num">2</span><div class="node">🔄</div><div class="who">Dashboard sync</div><h4>Synced &amp; tagged GBP</h4><p>Regular sync imports each call and tags it as source <b>GBP</b> (including Local SEO pools).</p></div>
         <div class="step a" style="--d:1.2s"><span class="num">3</span><div class="node">🤖</div><div class="who">AI</div><h4>Analyzed</h4><p>Booking status, summary, transcript and recording, like LSA &amp; SEM.</p></div>
         <div class="step a" style="--d:1.6s"><span class="num">4</span><div class="node"><svg class="node-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="3.5" width="19" height="17" rx="3" stroke="#0f4c81" stroke-width="1.8"/><path d="M2.5 8h19" stroke="#0f4c81" stroke-width="1.8"/><rect x="6" y="13" width="2.6" height="4.5" rx="1" fill="#2563eb"/><rect x="10.7" y="10.8" width="2.6" height="6.7" rx="1" fill="#0d9488"/><rect x="15.4" y="12" width="2.6" height="5.5" rx="1" fill="#d97706"/></svg></div><div class="who">Dashboard</div><h4>Reported</h4><p>GBP filter, KPI cards, call details and Excel export.</p></div>
       </div>
@@ -735,7 +876,7 @@
         <div class="card pool a" style="--d:2s">
           <h5>Where we get the GBP data</h5>
           <div class="pool-row"><span>Source</span><span><b>GoHighLevel (eMConnect)</b></span></div>
-          <div class="pool-row"><span>Calls from</span><span><b>GBP tracking numbers</b></span></div>
+          <div class="pool-row"><span>Pool names</span><span><b>GBP</b> or <b>Local SEO</b></span></div>
           <div class="pool-row"><span>Call details</span><span>Caller, date &amp; time, duration</span></div>
           <div class="pool-row"><span>Recording</span><span class="tag gbp">Included</span></div>
         </div>
@@ -748,6 +889,7 @@
           <div class="pool-row"><span>Past GBP calls</span><span class="pill soft">Imported</span></div>
         </div>
       </div>
+      <div class="alias-note a" style="--d:2.7s">📌 In eMConnect, some clients label the pool <b>GBP</b> and others <b>Local SEO</b>. Both map to Google Business Profile in Call Analyzer.</div>
     </div>
   </section>
 
@@ -756,8 +898,9 @@
     <div class="wrap">
       <div class="eyebrow a" style="color:var(--gbp)">Call Analyzer · New GBP source</div>
       <h2 class="a" style="--d:.1s">GBP next to LSA and SEM</h2>
+      <p class="lead a" style="--d:.15s;margin-bottom:0">Filters, KPIs, charts and Excel export all treat Local SEO pools as GBP.</p>
       <div class="src-filter a" style="--d:.2s">
-        <span class="src on">All sources</span><span class="src">Google LSA</span><span class="src">Google SEM</span><span class="src gbp-new">Google Business Profile</span>
+        <span class="src on">All sources</span><span class="src">Google LSA</span><span class="src">Google SEM</span><span class="src gbp-new">GBP / Local SEO</span>
       </div>
       <div class="kpi-grid">
         <div class="card kpi-card a" style="--c:var(--lsa);--d:.3s">
@@ -785,7 +928,7 @@
             <div style="font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.1em">CALLS BY SOURCE</div>
             <div><i style="background:var(--lsa)"></i>Google LSA</div>
             <div><i style="background:var(--sem)"></i>Google SEM</div>
-            <div><i style="background:var(--gbp)"></i>Google Business Profile</div>
+            <div><i style="background:var(--gbp)"></i>GBP (incl. Local SEO)</div>
           </div>
         </div>
         <div class="card export a" style="--d:1s">
@@ -798,44 +941,281 @@
           </div>
         </div>
       </div>
-      <p class="a" style="--d:1.1s;font-size:12px;color:var(--muted);margin-top:12px">Illustrative numbers.</p>
+      <p class="a" style="--d:1.1s;font-size:12px;color:var(--muted);margin-top:12px">Illustrative numbers. Local SEO pools from eMConnect appear under GBP everywhere.</p>
     </div>
   </section>
 
-  <!-- 10. Together -->
-  <section class="slide" data-title="Together">
+  <!-- 10. Embed why -->
+  <section class="slide" data-title="Embed why">
     <div class="wrap">
-      <div class="eyebrow a">RBAC + GBP working together</div>
-      <h2 class="a" style="--d:.1s">Client users see their own GBP calls only</h2>
-      <p class="lead a" style="--d:.2s">GBP data follows the same role and client rules as LSA and SEM. Nothing extra to configure.</p>
-      <div class="together">
-        <div class="card who-box a" style="--d:.35s">
-          <h3>Admin view</h3><p>All clients, all sources.</p>
-          <div class="lead-row a" style="--d:.5s"><b>AA Cooling</b><span class="tag gbp">GBP</span><span>Booked</span><span style="color:var(--muted)">Oct 21, 10:14</span></div>
-          <div class="lead-row a" style="--d:.6s"><b>All Star Heating</b><span class="tag lsa">LSA</span><span>Pending</span><span style="color:var(--muted)">Oct 21, 09:52</span></div>
-          <div class="lead-row a" style="--d:.7s"><b>AA Cooling</b><span class="tag sem">SEM</span><span>Not booked</span><span style="color:var(--muted)">Oct 21, 09:30</span></div>
-          <div class="lead-row a" style="--d:.8s"><b>Top Tech Mech</b><span class="tag gbp">GBP</span><span>Booked</span><span style="color:var(--muted)">Oct 20, 17:05</span></div>
+      <div class="eyebrow a" style="color:#15803d">Requirement 3 · Embed links</div>
+      <h2 class="a" style="--d:.1s">A URL for white-label reports</h2>
+      <p class="lead a" style="--d:.2s">Some clients only need the KPI view inside Explore Media’s reporting platform. They should not need a Call Analyzer login or tab-switching.</p>
+      <div class="grid3" style="margin-top:26px">
+        <div class="card feature a pop" style="--d:.35s">
+          <div class="ic" style="background:#f0fdf4">📎</div>
+          <h3>Paste a URL</h3>
+          <p>Same pattern as Data Studio or Accelerant: Admin copies a client link into the white-label widget (URL preferred over iframe).</p>
         </div>
-        <div class="card who-box a" style="--d:.5s">
-          <h3>Client user · AA Cooling</h3><p>Same list, filtered to their own client automatically.</p>
-          <div class="lead-row a" style="--d:1.1s"><b>AA Cooling</b><span class="tag gbp">GBP</span><span>Booked</span><span style="color:var(--muted)">Oct 21, 10:14</span></div>
-          <div class="lead-row hide a" style="--d:1.2s"><b>All Star Heating</b><span class="tag lsa">LSA</span><span>Hidden</span><span>—</span></div>
-          <div class="lead-row a" style="--d:1.3s"><b>AA Cooling</b><span class="tag sem">SEM</span><span>Not booked</span><span style="color:var(--muted)">Oct 21, 09:30</span></div>
-          <div class="lead-row hide a" style="--d:1.4s"><b>Top Tech Mech</b><span class="tag gbp">GBP</span><span>Hidden</span><span>—</span></div>
+        <div class="card feature a pop" style="--d:.5s">
+          <div class="ic" style="background:#eff6ff">👁️</div>
+          <h3>View-only KPIs</h3>
+          <p>Shows client name, performance cards and charts. No transcripts, lead table, or team settings.</p>
+        </div>
+        <div class="card feature a pop" style="--d:.65s">
+          <div class="ic" style="background:#fffbeb">🧭</div>
+          <h3>Two access paths</h3>
+          <p><b>Embed</b> for report viewers. <b>RBAC login</b> when they need recordings, reanalyze, or exports.</p>
+        </div>
+      </div>
+      <div class="card a" style="--d:.8s;margin-top:18px;padding:16px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+        <span class="pill embed">Portable</span>
+        <span style="font-size:13px;color:var(--muted)">One client URL works in the white-label portal, Google Slides, or any tool that accepts a link. It updates when the dashboard data updates.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Embed clients row -->
+  <section class="slide" data-title="Embed button">
+    <div class="wrap">
+      <div class="eyebrow a" style="color:#15803d">Clients → Actions</div>
+      <h2 class="a" style="--d:.1s">One Embed link button per client</h2>
+      <p class="lead a" style="--d:.2s">Always labelled <b>Embed link</b>. It opens the same modal every time. A green dot means that client already has an active share link.</p>
+      <div class="card clients-mock a" style="--d:.35s">
+        <div class="cm-head">
+          <div><h3>Client Management &amp; Source Mapping</h3><span>Actions start with Embed link, then Sync</span></div>
+          <span class="pill soft" style="background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.25)">+ Create client</span>
+        </div>
+        <table class="cm-table">
+          <thead>
+            <tr><th>Client name</th><th>Source</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <tr class="a" style="--d:.5s">
+              <td><div class="cm-name">A&amp;A Cooling and Heating<small>● Synced · link active</small></div></td>
+              <td>Call Analyzer</td>
+              <td>
+                <div class="cm-actions">
+                  <span class="cm-btn embed"><i class="cm-dot" aria-hidden="true"></i>Embed link</span>
+                  <span class="cm-btn sync">Sync</span>
+                  <span class="cm-btn rean">Re-analyze</span>
+                  <span class="cm-btn icon">✎</span>
+                  <span class="cm-btn icon">🗑</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="a" style="--d:.65s">
+              <td><div class="cm-name">Air Comfort Services<small style="color:var(--muted)">● Synced</small></div></td>
+              <td>Call Analyzer</td>
+              <td>
+                <div class="cm-actions">
+                  <span class="cm-btn embed">Embed link</span>
+                  <span class="cm-btn sync">Sync</span>
+                  <span class="cm-btn rean">Re-analyze</span>
+                  <span class="cm-btn icon">✎</span>
+                  <span class="cm-btn icon">🗑</span>
+                </div>
+              </td>
+            </tr>
+            <tr class="a" style="--d:.8s">
+              <td><div class="cm-name">Lens Heating &amp; Cooling<small style="color:var(--muted)">● Synced</small></div></td>
+              <td>Call Analyzer</td>
+              <td>
+                <div class="cm-actions">
+                  <span class="cm-btn embed">Embed link</span>
+                  <span class="cm-btn sync">Sync</span>
+                  <span class="cm-btn rean">Re-analyze</span>
+                  <span class="cm-btn icon">✎</span>
+                  <span class="cm-btn icon">🗑</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="a" style="--d:.95s;font-size:12px;color:var(--muted);margin-top:12px">Green dot = active embed link for that client. No second button label to learn.</p>
+    </div>
+  </section>
+
+  <!-- 10. Embed generate modal -->
+  <section class="slide" data-title="Generate link">
+    <div class="wrap">
+      <div class="eyebrow a" style="color:#15803d">Embed link · No link yet</div>
+      <h2 class="a" style="--d:.1s">Generate a share URL</h2>
+      <p class="lead a" style="--d:.2s">Pick which dashboard to share and how long the link lasts. <b>Never</b> is pre-selected so the common case needs no change.</p>
+      <div class="card embed-modal a pop" style="--d:.4s">
+        <div class="em-head">
+          <div><b>Embed link · A&amp;A Cooling and Heating</b><div style="font-size:12px;color:var(--muted);font-weight:600;margin-top:2px">No active link</div></div>
+          <span style="color:var(--muted);font-weight:700">✕</span>
+        </div>
+        <div class="em-body">
+          <div>
+            <div class="em-label">Dashboard</div>
+            <div class="em-dash">
+              <div class="em-opt on"><span class="em-radio"></span>Call Analyzer <span class="pill soft" style="margin-left:auto">Default</span></div>
+              <div class="em-opt"><span class="em-radio"></span>Service Page Optimizer</div>
+              <div class="em-opt"><span class="em-radio"></span>HVAC Website Audit</div>
+              <div class="em-opt"><span class="em-radio"></span>Competitor SEO Audit</div>
+            </div>
+          </div>
+          <div>
+            <div class="em-label">Link expires</div>
+            <div class="em-expiry">
+              <span class="em-chip">24 hours</span>
+              <span class="em-chip">7 days</span>
+              <span class="em-chip">30 days</span>
+              <span class="em-chip on">Never</span>
+            </div>
+          </div>
+          <div class="em-foot">
+            <span class="em-btn">Cancel</span>
+            <span class="em-btn primary">Generate link</span>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 11. Thank you -->
+  <!-- 11. Embed active modal -->
+  <section class="slide" data-title="Active link">
+    <div class="wrap">
+      <div class="eyebrow a" style="color:#15803d">Embed link · Link exists</div>
+      <h2 class="a" style="--d:.1s">Copy, extend, or expire</h2>
+      <p class="lead a" style="--d:.2s">When a link is already live, the same modal shows the URL and status. Admin can copy it, extend expiry, or expire it immediately.</p>
+      <div class="card embed-modal a pop" style="--d:.4s">
+        <div class="em-head">
+          <div><b>Embed link · A&amp;A Cooling and Heating</b><div style="font-size:12px;color:var(--muted);font-weight:600;margin-top:2px">Call Analyzer</div></div>
+          <span style="color:var(--muted);font-weight:700">✕</span>
+        </div>
+        <div class="em-body">
+          <div>
+            <div class="em-label">URL</div>
+            <div class="em-url-row">
+              <code>https://hub.exploremedia.com/share/aa-cooling?t=8f3a…</code>
+              <span class="em-btn primary" style="height:30px;padding:0 12px;font-size:12px">Copy</span>
+            </div>
+          </div>
+          <div class="em-status a" style="--d:.55s">
+            <span class="cm-dot"></span>
+            <span class="ok">Never expires</span>
+            <span style="color:#cbd5e1">·</span>
+            <span>Also: “Expires on 22 Oct” or “Link expired”</span>
+          </div>
+          <div>
+            <div class="em-label">Extend</div>
+            <div class="em-expiry">
+              <span class="em-chip">24 hours</span>
+              <span class="em-chip">7 days</span>
+              <span class="em-chip">30 days</span>
+              <span class="em-chip on">Never</span>
+            </div>
+          </div>
+          <div class="em-actions-row a" style="--d:.7s">
+            <span class="em-btn primary">Apply extend</span>
+            <span class="em-btn danger">Expire link</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12. Embed share view -->
+  <section class="slide" data-title="Share view">
+    <div class="wrap">
+      <div class="eyebrow a" style="color:#15803d">Shared URL · What clients see</div>
+      <h2 class="a" style="--d:.1s">KPIs, charts, and a date range</h2>
+      <p class="lead a" style="--d:.2s">The link opens a stripped Call Analyzer view for that client only. Date range is the only clickable control, ideal for embedding in the white-label platform.</p>
+      <div class="share-view a" style="--d:.35s">
+        <div class="sv-bar">
+          <div>
+            <span>View only · Call Analyzer</span>
+            <b style="display:block;margin-top:4px">ACTIVE CLIENT: A&amp;A Cooling and Heating</b>
+          </div>
+          <div class="sv-date">Last 30 Days</div>
+        </div>
+        <div class="sv-body">
+          <div class="sv-kpis">
+            <div class="sv-kpi"><small>Scheduled leads</small><b>3</b><div class="split"><span>LSA 2</span><span>SEM 1</span><span>GBP 0</span></div></div>
+            <div class="sv-kpi"><small>Charged leads</small><b>19</b><div class="split"><span>LSA 0</span><span>SEM 19</span><span>GBP 0</span></div></div>
+            <div class="sv-kpi"><small>Booked rate</small><b>15.8%</b><div class="split"><span>LSA 100%</span><span>SEM 10.5%</span></div></div>
+          </div>
+          <div class="sv-charts">
+            <div class="sv-chart">
+              <h5>Platform share (LSA / SEM / GBP)</h5>
+              <div class="sv-donut-wrap">
+                <svg class="donut sv-donut" viewBox="0 0 120 120" aria-hidden="true">
+                  <circle cx="60" cy="60" r="44" stroke="#f1f5f9"></circle>
+                  <circle cx="60" cy="60" r="44" stroke="var(--lsa)" data-v="3" stroke-dasharray="0 999"></circle>
+                  <circle cx="60" cy="60" r="44" stroke="var(--sem)" data-v="19" stroke-dasharray="0 999"></circle>
+                  <circle cx="60" cy="60" r="44" stroke="var(--gbp)" data-v="0" stroke-dasharray="0 999"></circle>
+                </svg>
+                <div class="sv-donut-legend">
+                  <div><i style="background:var(--lsa)"></i>LSA · 3</div>
+                  <div><i style="background:var(--sem)"></i>SEM · 19</div>
+                  <div><i style="background:var(--gbp)"></i>GBP · 0</div>
+                </div>
+              </div>
+            </div>
+            <div class="sv-chart">
+              <h5>Booked status</h5>
+              <div class="sv-donut-wrap">
+                <svg class="donut sv-donut" viewBox="0 0 120 120" aria-hidden="true">
+                  <circle cx="60" cy="60" r="44" stroke="#f1f5f9"></circle>
+                  <circle cx="60" cy="60" r="44" stroke="var(--ok)" data-v="3" stroke-dasharray="0 999"></circle>
+                  <circle cx="60" cy="60" r="44" stroke="var(--bad)" data-v="19" stroke-dasharray="0 999"></circle>
+                  <circle cx="60" cy="60" r="44" stroke="var(--warn)" data-v="0" stroke-dasharray="0 999"></circle>
+                </svg>
+                <div class="sv-donut-legend">
+                  <div><i style="background:var(--ok)"></i>Yes · 3</div>
+                  <div><i style="background:var(--bad)"></i>No · 19</div>
+                  <div><i style="background:var(--warn)"></i>Pending · 0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="sv-note a" style="--d:.6s">Only the date range control is interactive. No sidebar, lead table, transcripts, or exports on this URL.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15. Together -->
+  <section class="slide" data-title="Together">
+    <div class="wrap">
+      <div class="eyebrow a">RBAC · GBP · Embed working together</div>
+      <h2 class="a" style="--d:.1s">Login for deep work · Embed for reports</h2>
+      <p class="lead a" style="--d:.2s">GBP follows the same role and client rules as LSA and SEM. Embed links are a separate, view-only path for white-label reporting.</p>
+      <div class="together">
+        <div class="card who-box a" style="--d:.35s">
+          <h3>Path A · RBAC login</h3><p>Full Call Analyzer for staff who train on calls.</p>
+          <div class="lead-row a" style="--d:.5s"><b>AA Cooling</b><span class="tag gbp">GBP</span><span>Booked</span><span style="color:var(--muted)">Transcript ✓</span></div>
+          <div class="lead-row a" style="--d:.6s"><b>AA Cooling</b><span class="tag sem">SEM</span><span>Not booked</span><span style="color:var(--muted)">Recording ✓</span></div>
+          <div class="lead-row a" style="--d:.7s"><b>AA Cooling</b><span class="tag lsa">LSA</span><span>Pending</span><span style="color:var(--muted)">Reanalyze ✓</span></div>
+          <div style="margin-top:12px;font-size:12px;color:var(--muted);font-weight:600">Other clients hidden by role. Multi-client users (e.g. AA Cooling + Mast Air) supported.</div>
+        </div>
+        <div class="card who-box a" style="--d:.5s">
+          <h3>Path B · Embed URL</h3><p>KPI view inside white-label / Slides. No account needed.</p>
+          <div class="lead-row a" style="--d:1.1s"><b>Client name</b><span class="pill soft">Locked</span><span>KPIs</span><span style="color:var(--muted)">Charts</span></div>
+          <div class="lead-row a" style="--d:1.2s"><b>Date range</b><span class="pill ok">Only control</span><span style="color:var(--muted)">Interactive</span></div>
+          <div class="lead-row hide a" style="--d:1.3s"><b>Lead table</b><span class="tag lsa">LSA</span><span>Hidden</span></div>
+          <div class="lead-row hide a" style="--d:1.4s"><b>Transcripts</b><span class="tag gbp">GBP</span><span>Hidden</span></div>
+          <div style="margin-top:12px;font-size:12px;color:var(--muted);font-weight:600">Generated from Clients → Embed link. Green dot = active.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16. Thank you -->
   <section class="slide" data-title="Thank you">
     <div class="wrap">
       <div class="hero a" style="text-align:center">
         <div class="eyebrow">Central Dashboard &middot; Phase 2</div>
         <h1>Thank you</h1>
-        <p style="margin-left:auto;margin-right:auto">Role-Based Access &amp; GBP Calls in the Central Dashboard.</p>
+        <p style="margin-left:auto;margin-right:auto">Role-Based Access, GBP Calls &amp; Embed Links in the Central Dashboard.</p>
         <div class="hero-row" style="justify-content:center">
-          <div class="hero-chip a" style="--d:.3s"><b>Questions?</b><span>Happy to walk through any part</span></div>
+          <div class="hero-chip a" style="--d:.3s"><b>RBAC</b><span>Roles · invites · client scope</span></div>
+          <div class="hero-chip a" style="--d:.45s"><b>GBP</b><span>Incl. Local SEO from eMConnect</span></div>
+          <div class="hero-chip a" style="--d:.6s"><b>Embed</b><span>View-only KPI URL</span></div>
         </div>
       </div>
     </div>
@@ -884,16 +1264,17 @@
     { t: 'RBAC foundation', s: 'Roles, permissions, invite with role', a: 0, b: 6, c: 'var(--navy)' },
     { t: 'Team Access screens', s: 'Users, invite, roles & permissions', a: 3, b: 10, c: 'var(--navy)' },
     { t: 'Permission-based dashboard', s: 'Sidebar, pages, actions, client scope', a: 7, b: 13, c: 'var(--navy)' },
-    { t: 'GBP data integration', s: 'Tag GBP pools, sync, AI analysis, backfill', a: 14, b: 21, c: 'var(--gbp)' },
+    { t: 'GBP data integration', s: 'GBP + Local SEO pools, sync, AI', a: 14, b: 21, c: 'var(--gbp)' },
     { t: 'GBP in the dashboard', s: 'Source filter, KPI cards, export', a: 19, b: 25, c: 'var(--gbp)' },
-    { t: 'Testing, review & go-live', s: 'All roles end-to-end, client sign-off', a: 26, b: 31, c: 'var(--ok)' },
+    { t: 'Embed share links', s: 'Clients modal, token URL, KPI view', a: 16, b: 26, c: '#15803d' },
+    { t: 'Testing, review & go-live', s: 'All roles, embed, client sign-off', a: 26, b: 31, c: 'var(--ok)' },
   ];
   const gantt = document.getElementById('gantt');
   if (gantt) gantt.innerHTML = rows.map((r, i) => {
     const left = (r.a / TOTAL) * 100;
     const width = ((r.b - r.a + 1) / TOTAL) * 100;
     return `<div class="g-row"><div class="t"><span>${r.t}<small>${r.s}</small></span></div>
-      <div class="lane"><div class="gbar" style="--s:${left}%;--w:${width}%;--c:${r.c};--d:${0.5 + i * 0.25}s">${fmt(r.a)} – ${fmt(r.b)}</div></div></div>`;
+      <div class="lane"><div class="gbar" style="--s:${left}%;--w:${width}%;--c:${r.c};--d:${0.5 + i * 0.25}s">${fmt(r.a)} - ${fmt(r.b)}</div></div></div>`;
   }).join('') + milestones();
 
   function fmt(day) {
@@ -925,16 +1306,18 @@
   }
 
   (function drawDonut() {
-    const parts = Array.from(document.querySelectorAll('#donut circle[data-v]'));
-    const total = parts.reduce((n, c) => n + +c.dataset.v, 0);
-    const C = 2 * Math.PI * 44;
-    let offset = 0;
-    parts.forEach((c, i) => {
-      const len = (+c.dataset.v / total) * C;
-      c.style.strokeDasharray = `${len} ${C - len}`;
-      c.style.strokeDashoffset = `${-offset}`;
-      c.style.setProperty('--d', `${0.9 + i * 0.25}s`);
-      offset += len;
+    document.querySelectorAll('svg.donut').forEach((svg) => {
+      const parts = Array.from(svg.querySelectorAll('circle[data-v]'));
+      const total = parts.reduce((n, c) => n + +c.dataset.v, 0) || 1;
+      const C = 2 * Math.PI * 44;
+      let offset = 0;
+      parts.forEach((c, i) => {
+        const len = (+c.dataset.v / total) * C;
+        c.style.strokeDasharray = `${len} ${C - len}`;
+        c.style.strokeDashoffset = `${-offset}`;
+        c.style.setProperty('--d', `${0.9 + i * 0.25}s`);
+        offset += len;
+      });
     });
   })();
 
